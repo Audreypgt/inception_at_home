@@ -1,0 +1,85 @@
+version: "3"
+# docker version
+
+services:
+	nginx:
+		container_name: nginx
+		# compose does not scale a service beyond one container if the compose file specifies a container_name
+		build:
+			context: path/to/dockerfile
+		ports:
+			- "443:443"
+			# ports: accessible ports by host machine
+		restart: unless-stopped
+		depends-on:
+			wordpress
+		network:
+			docker-network
+		volumes:
+			wordpress:/var/www/wordpress
+			# needs access to the website files
+
+#restart: unless-stopped : better than on-failure as it handles more cases where the container needs restart,
+# such as a lost network connexion, being blocked following an internal error which isn't detected as an error
+# by the system unless-stopped is similar to always but it won't restart when stopped manually
+# on-failure will restart only when there is an exit code other than 0
+
+# depends-on order : database -> wordpress -> nginx
+# wordpress needs to find its database to start, otherwise it will raise errors, and nginx, our server,
+# needs to find the service it's made to connect to otherwise it will raise a "502 Bad Gateway" error
+# image: we build a house with the foundations (DB), the walls (WordPress), then the door (NGINX)
+
+	mariadb:
+		container_name: mariadb
+		build:
+			context: path/to/dockerfile
+		restart: unless-stopped
+		network:
+			docker-network
+		volumes:
+			mariadb:/var/lib/mysql
+		environment:
+
+	wordpress:
+		container_name: wordpress
+		build:
+			context: path/to/dockerfile
+		restart: unless-stopped
+		depends-on:
+			mariadb
+		network:
+			docker-network
+		volumes:
+			wordpress:/var/www/wordpress
+		environment:
+
+networks:
+	docker-network:
+		driver: default # default == bridge, creates a network where only the containers inside it can communicate
+		# completely isolated from the host machine's network (opposite is mode host)
+
+volumes:
+	driver: local
+	# defines the docker driver to be used, can be local for data stored on the host machine, cloud or network for
+	# shared storage data
+	driver-opts:
+	# lets you customize where and how the volume is stored on the host
+		type:
+		# specifies the filesystem type (eg ext4, tmpfs, or none for bind mounts)
+			none
+		o:
+			bind
+		# mount options (eg bind for bind mounts, ro for read-only, size=1G for tmpfs)
+		device:
+		# path to the host device directory or special value (eg tmpfs for in-memory storage)
+			/home/apeuget42/data
+		# where data will be stored on host machine
+
+# you have volumes and bind mounts
+# volumes stores data on your host machine, Docker handles everything itself
+# bind mounts does the same, but you handle it yourself, and give a specific folder on the host machine
+# here, we are asked for a volume that acts like a bind mounts, so it's fucking annoying
+# we could simply do this in the container part in services: 
+	# /home/apeuget42/data:/var/lib/mysql
+	# left = local host, right = container
+# but no, it's never that easy
