@@ -16,7 +16,7 @@ services:
 		network:
 			docker-network
 		volumes:
-			wordpress:/var/www/wordpress
+			wordpress_vol:/var/www/wordpress
 			# needs access to the website files
 
 #restart: unless-stopped : better than on-failure as it handles more cases where the container needs restart,
@@ -24,7 +24,7 @@ services:
 # by the system unless-stopped is similar to always but it won't restart when stopped manually
 # on-failure will restart only when there is an exit code other than 0
 
-# depends-on order : database -> wordpress -> nginx
+# depends-on order: database -> wordpress -> nginx
 # wordpress needs to find its database to start, otherwise it will raise errors, and nginx, our server,
 # needs to find the service it's made to connect to otherwise it will raise a "502 Bad Gateway" error
 # image: we build a house with the foundations (DB), the walls (WordPress), then the door (NGINX)
@@ -37,7 +37,7 @@ services:
 		network:
 			docker-network
 		volumes:
-			mariadb:/var/lib/mysql
+			mariadb_vol:/var/lib/mysql
 		environment:
 
 	wordpress:
@@ -50,7 +50,7 @@ services:
 		network:
 			docker-network
 		volumes:
-			wordpress:/var/www/wordpress
+			wordpress_vol:/var/www/wordpress
 		environment:
 
 networks:
@@ -59,21 +59,25 @@ networks:
 		# completely isolated from the host machine's network (opposite is mode host)
 
 volumes:
-	driver: local
-	# defines the docker driver to be used, can be local for data stored on the host machine, cloud or network for
-	# shared storage data
-	driver-opts:
-	# lets you customize where and how the volume is stored on the host
-		type:
-		# specifies the filesystem type (eg ext4, tmpfs, or none for bind mounts)
-			none
-		o:
-			bind
-		# mount options (eg bind for bind mounts, ro for read-only, size=1G for tmpfs)
-		device:
-		# path to the host device directory or special value (eg tmpfs for in-memory storage)
-			/home/apeuget42/data
-		# where data will be stored on host machine
+	mariadb_vol:
+		driver: local
+		# defines the docker driver to be used, can be local for data stored on the host machine, cloud or network for
+		# shared storage data
+		driver-opts:
+		# lets you customize where and how the volume is stored on the host
+			type: none
+			# specifies the filesystem type (eg ext4, tmpfs, or none for bind mounts)
+			o: bind
+			# mount options (eg bind for bind mounts, ro for read-only, size=1G for tmpfs)
+			device: /home/apeuget42/data
+			# path to the host device directory or special value (eg tmpfs for in-memory storage)
+			# where data will be stored on host machine
+		wordpress_vol:
+			driver: local
+			driver-opts:
+				type: none
+				o: bind
+				device: /home/apeuget42/data
 
 # you have volumes and bind mounts
 # volumes stores data on your host machine, Docker handles everything itself

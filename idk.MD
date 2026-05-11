@@ -1,8 +1,14 @@
 TODO :
-create database
-add website to wordpress files
-.env file
-environments var in docker compose for mariadb and wordpress
+- understand better how to run an image, start/stop a cont, and how to not get the latest version of nginx automatically from my dockerfile
+- shell script wordpress
+- dockerfile for wordpress
+- environments variables in docker compose for mariadb and wordpress
+- final check .env file + check txt files
+- docker network
+- makefile
+
+
+- refaire VM comme avant mais en cochant gnome quand on coche ce quon isntalle pour avoir interface graphique
 
 docker-compose up (to run it) -d (to have it in the background)
 docker-compose down
@@ -16,19 +22,8 @@ ex:
     docker run myimage World
         --> Hello from World
 
-TO ADD TO Dockerfile for nginx:
 
-RUN chmod 755 /var/www/wordpress
-# giving us (root user) all rights needed on our wordpress folder
-RUN chown -R www-data:www-data /var/www/wordpress
-# chown -R: change a file/folder's owner and group rights recursively (R) for the given folder
-# chown user:group to modify both at the same time
-# user and group www-data are created by debian by default because the security convention is that a web server shouldn't run on root, this role and group are then created for that, which is a role priviledge only to run web pages, and restricted from anything else on the system (eg dl softwares, read psswds...)
-
-CMD ["nginx", "-g", "daemon off;"]
-# tells nginx to run in the foreground instead of the background like a daamon (whence the daemon off) to prevent it from exiting abruptly after turning it on
-
-
+setting up mariadb: https://oneuptime.com/blog/post/2026-01-16-docker-mysql-mariadb/view
 git clone for website: https://github.com/Lmendev/CartoonNetwork-2000-Clone.git
 git@github.com:Lmendev/CartoonNetwork-2000-Clone.git
 https://wordpress.com/theme/pixl?tab_filter=blog&tier_filter=free
