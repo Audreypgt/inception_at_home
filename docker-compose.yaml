@@ -18,6 +18,7 @@ services:
 		volumes:
 			wordpress_vol:/var/www/wordpress
 			# needs access to the website files
+		env_file: .env
 
 #restart: unless-stopped : better than on-failure as it handles more cases where the container needs restart,
 # such as a lost network connexion, being blocked following an internal error which isn't detected as an error
@@ -38,7 +39,7 @@ services:
 			docker-network
 		volumes:
 			mariadb_vol:/var/lib/mysql
-		environment:
+		env_file: .env
 
 	wordpress:
 		container_name: wordpress
@@ -51,7 +52,7 @@ services:
 			docker-network
 		volumes:
 			wordpress_vol:/var/www/wordpress
-		environment:
+		env_file: .env
 
 networks:
 	docker-network:

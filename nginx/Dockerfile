@@ -3,8 +3,10 @@ FROM debian:bookworm
 # container
 
 
-RUN apt update
-RUN apt install nginx -y
+RUN apt-get update -y && apt-get upgrade -y
+# update: updates list of available packages and their versions
+# upgrade: installs newer versions
+RUN apt-get install nginx -y
 # this is when our container becomes a nginx container
 # -y : apt will ask if we want to continue with installation, -y allows us to answer before end
 # so it doesn't stop to get our input
@@ -15,7 +17,7 @@ RUN apt install nginx -y
 RUN mkdir -p /etc/nginx/ssl
 # -p allows us to create the folder ssl AND its parents
 # this folder will be the place where we store our certificate and key for the secured connection
-RUN apt install openssl -y
+RUN apt-get install openssl -y
 # OpenSSL if a tool for handling and creating SSL certificates
 RUN openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/nginx/ssl/inception.key \
     -subj "/C=FR/L=Marseille/O=42/CN=apeuget.42.fr/UID=apeuget42"
