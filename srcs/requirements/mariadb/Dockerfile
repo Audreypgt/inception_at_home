@@ -1,6 +1,8 @@
 FROM debian:bookworm
 
 RUN apt-get update -y && apt-get upgrade -y && apt-get install mariadb-server -y && mariadb-client
+RUN --mount=type=secret, id=db_password && --mount=type=secret, id=db_root_password
+
 
 COPY conf/mariadb.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
 # COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf

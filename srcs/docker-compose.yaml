@@ -18,9 +18,8 @@ services:
 		volumes:
 			wordpress_vol:/var/www/wordpress
 			# needs access to the website files
-		env_file: .env
 
-#restart: unless-stopped : better than on-failure as it handles more cases where the container needs restart,
+# restart: unless-stopped : better than on-failure as it handles more cases where the container needs restart,
 # such as a lost network connexion, being blocked following an internal error which isn't detected as an error
 # by the system unless-stopped is similar to always but it won't restart when stopped manually
 # on-failure will restart only when there is an exit code other than 0
@@ -40,6 +39,17 @@ services:
 		volumes:
 			mariadb_vol:/var/lib/mysql
 		env_file: .env
+		secrets: 
+			- db_password
+			- db_root_password
+			- db_2nd_user_password
+			- db_2nd_user
+			- db_admin_password
+			- db_admin
+			- db_name
+			- db_password
+			- db_root_password
+			- db_user
 
 	wordpress:
 		container_name: wordpress
@@ -53,6 +63,17 @@ services:
 		volumes:
 			wordpress_vol:/var/www/wordpress
 		env_file: .env
+		secrets: 
+			- db_password
+			- db_root_password
+			- db_2nd_user_password
+			- db_2nd_user
+			- db_admin_password
+			- db_admin
+			- db_name
+			- db_password
+			- db_root_password
+			- db_user
 
 networks:
 	docker-network:
@@ -80,6 +101,39 @@ volumes:
 				o: bind
 				device: /home/apeuget42/data
 
+secrets:
+	db_password:
+		file: 
+			../secrets/db_password.txt
+	db_root_password:
+		file: 
+		../secrets/db_root_password.txt
+	db_2nd_user_password:
+		file: 
+		../secrets/db_2nd_user_password.txt
+	db_2nd_user:
+		file: 
+		../secrets/db_2nd_user.txt
+	db_admin_password:
+		file: 
+		../secrets/db_admin_password.txt
+	db_admin:
+		file: 
+		../secrets/db_admin.txt
+	db_name:
+		file: 
+		../secrets/db_name.txt
+	db_password:
+		file: 
+		../secrets/db_password.txt
+	db_root_password:
+		file: 
+		../secrets/db_root_password.txt
+	db_user:
+		file: 
+		../secrets/db_user.txt
+
+
 # you have volumes and bind mounts
 # volumes stores data on your host machine, Docker handles everything itself
 # bind mounts does the same, but you handle it yourself, and give a specific folder on the host machine
@@ -88,3 +142,4 @@ volumes:
 	# /home/apeuget42/data:/var/lib/mysql
 	# left = local host, right = container
 # but no, it's never that easy
+

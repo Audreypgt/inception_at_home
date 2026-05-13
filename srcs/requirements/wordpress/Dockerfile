@@ -13,6 +13,8 @@ RUN cd /var/www/ wp core download
 
 RUN chown -R root:root /var/www/wordpress
 
+RUN --mount=type=secret, id=db_password && --mount=type=secret, id=db_root_password
+
 # COPY conf/php.ini /etc/php/php.ini
 # to add to conf and to modify when its installed and i get the original one and check path for
 # php in container

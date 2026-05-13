@@ -44,6 +44,8 @@ example:
 7th step:
 - makefile
 
+# Useful commands
+docker-compose ps to find docker conts in that docker compose environment
 
 
 # Resources:
