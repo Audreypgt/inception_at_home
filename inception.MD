@@ -47,6 +47,14 @@ example:
 # Useful commands
 docker-compose ps to find docker conts in that docker compose environment
 
+# Error fixes:
+### Permission denied when make up:
+https://www.hostinger.com/tutorials/how-to-fix-docker-permission-denied-error
+Don't forget to reboot so changes take affect (use `id -nG` to check)
+
+### Network is unreachable:
+"target mariadb: failed to solve: debian:bookworm: failed to resolve source metadata for docker.io/library/debian:bookworm: failed to do request: Head "https://registry-1.docker.io/v2/library/debian/manifests/bookworm": dial tcp [2600:1f18:2148:bc00:c80c:3676:30dd:a616]:443: connect: network is unreachable"  
+-> change IP adress in file etc/resolv.conf to 8.8.8.8 (DNS) to prevent being blocked
 
 # Resources:
 

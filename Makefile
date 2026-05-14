@@ -11,14 +11,14 @@
 # .PHONY:
 # 	all, down, clean
 
-all:
-	@docker compose -f ./scrs/docker-compose.yaml up -d --build
+up:
+	@docker compose -f ./srcs/docker-compose.yaml up -d --build
 
 down:
-	@docker compose -f ./scrs/docker-compose.yaml down
+	@docker compose -f ./srcs/docker-compose.yaml down
 
 re:
-	@docker compose -f scrs/docker-compose.yaml up -d --build
+	@docker compose -f ./srcs/docker-compose.yaml up -d --build
 
 clean:
 	@docker stop $$(docker ps -qa);\

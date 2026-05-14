@@ -1,137 +1,120 @@
-version: "3"
-# docker version
-
 services:
-	nginx:
-		container_name: nginx
-		# compose does not scale a service beyond one container if the compose file specifies a container_name
-		build:
-			context: path/to/dockerfile
-		ports:
-			- "443:443"
-			# ports: accessible ports by host machine
-		restart: unless-stopped
-		depends-on:
-			wordpress
-		network:
-			docker-network
-		volumes:
-			wordpress_vol:/var/www/wordpress
-			# needs access to the website files
+  nginx:
+    container_name: nginx
+    # compose does not scale a service beyond one container if the compose file specifies a container_name
+    build:
+      context: requirements/nginx
+    ports:
+      - "443:443"
+      # ports: accessible ports by host machine
+    restart: unless-stopped
+    depends_on:
+      - wordpress
+    networks:
+      - docker-network
+    volumes:
+      - wordpress_vol:/var/www/wordpress
+      # needs access to the website files
 
 # restart: unless-stopped : better than on-failure as it handles more cases where the container needs restart,
 # such as a lost network connexion, being blocked following an internal error which isn't detected as an error
 # by the system unless-stopped is similar to always but it won't restart when stopped manually
 # on-failure will restart only when there is an exit code other than 0
 
-# depends-on order: database -> wordpress -> nginx
+# depends_on order: database -> wordpress -> nginx
 # wordpress needs to find its database to start, otherwise it will raise errors, and nginx, our server,
 # needs to find the service it's made to connect to otherwise it will raise a "502 Bad Gateway" error
 # image: we build a house with the foundations (DB), the walls (WordPress), then the door (NGINX)
 
-	mariadb:
-		container_name: mariadb
-		build:
-			context: path/to/dockerfile
-		restart: unless-stopped
-		network:
-			docker-network
-		volumes:
-			mariadb_vol:/var/lib/mysql
-		env_file: .env
-		secrets: 
-			- db_password
-			- db_root_password
-			- db_2nd_user_password
-			- db_2nd_user
-			- db_admin_password
-			- db_admin
-			- db_name
-			- db_password
-			- db_root_password
-			- db_user
+  mariadb:
+    container_name: mariadb
+    build:
+      context: requirements/mariadb
+    restart: unless-stopped
+    networks:
+      - docker-network
+    volumes:
+      - mariadb_vol:/var/lib/mysql
+    env_file: .env
+    secrets: 
+      - db_password
+      - db_root_password
+      - db_2nd_user_password
+      - db_2nd_user
+      - db_admin_password
+      - db_admin
+      - db_name
+      - db_password
+      - db_root_password
+      - db_user
 
-	wordpress:
-		container_name: wordpress
-		build:
-			context: path/to/dockerfile
-		restart: unless-stopped
-		depends-on:
-			mariadb
-		network:
-			docker-network
-		volumes:
-			wordpress_vol:/var/www/wordpress
-		env_file: .env
-		secrets: 
-			- db_password
-			- db_root_password
-			- db_2nd_user_password
-			- db_2nd_user
-			- db_admin_password
-			- db_admin
-			- db_name
-			- db_password
-			- db_root_password
-			- db_user
+  wordpress:
+    container_name: wordpress
+    build:
+      context: requirements/wordpress
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+    networks:
+      - docker-network
+    volumes:
+      - wordpress_vol:/var/www/wordpress
+    env_file: .env
+    secrets: 
+      - db_password
+      - db_root_password
+      - db_2nd_user_password
+      - db_2nd_user
+      - db_admin_password
+      - db_admin
+      - db_name
+      - db_password
+      - db_root_password
+      - db_user
 
 networks:
-	docker-network:
-		driver: default # default == bridge, creates a network where only the containers inside it can communicate
-		# completely isolated from the host machine's network (opposite is mode host)
+  docker-network:
+    driver: default # default == bridge, creates a network where only the containers inside it can communicate
+    # completely isolated from the host machine's network (opposite is mode host)
 
 volumes:
-	mariadb_vol:
-		driver: local
-		# defines the docker driver to be used, can be local for data stored on the host machine, cloud or network for
-		# shared storage data
-		driver-opts:
-		# lets you customize where and how the volume is stored on the host
-			type: none
-			# specifies the filesystem type (eg ext4, tmpfs, or none for bind mounts)
-			o: bind
-			# mount options (eg bind for bind mounts, ro for read-only, size=1G for tmpfs)
-			device: /home/apeuget42/data
-			# path to the host device directory or special value (eg tmpfs for in-memory storage)
-			# where data will be stored on host machine
-		wordpress_vol:
-			driver: local
-			driver-opts:
-				type: none
-				o: bind
-				device: /home/apeuget42/data
+  mariadb_vol:
+    driver: local
+    # defines the docker driver to be used, can be local for data stored on the host machine, cloud or network for
+    # shared storage data
+    driver_opts:
+    # lets you customize where and how the volume is stored on the host
+      type: none
+      # specifies the filesystem type (eg ext4, tmpfs, or none for bind mounts)
+      o: bind
+      # mount options (eg bind for bind mounts, ro for read-only, size=1G for tmpfs)
+      device: /home/apeuget42/data
+      # path to the host device directory or special value (eg tmpfs for in-memory storage)
+      # where data will be stored on host machine
+  wordpress_vol:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/apeuget42/data
 
 secrets:
-	db_password:
-		file: 
-			../secrets/db_password.txt
-	db_root_password:
-		file: 
-		../secrets/db_root_password.txt
-	db_2nd_user_password:
-		file: 
-		../secrets/db_2nd_user_password.txt
-	db_2nd_user:
-		file: 
-		../secrets/db_2nd_user.txt
-	db_admin_password:
-		file: 
-		../secrets/db_admin_password.txt
-	db_admin:
-		file: 
-		../secrets/db_admin.txt
-	db_name:
-		file: 
-		../secrets/db_name.txt
-	db_password:
-		file: 
-		../secrets/db_password.txt
-	db_root_password:
-		file: 
-		../secrets/db_root_password.txt
-	db_user:
-		file: 
-		../secrets/db_user.txt
+  db_password:
+    file: ../secrets/db_password.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  db_2nd_user_password:
+    file: ../secrets/db_2nd_user_password.txt
+  db_2nd_user:
+    file: ../secrets/db_2nd_user.txt
+  db_admin_password:
+    file: ../secrets/db_admin_password.txt
+  db_admin:
+    file: ../secrets/db_admin.txt
+  db_name:
+    file: ../secrets/db_name.txt
+  db_user:
+    file: ../secrets/db_user.txt
 
 
 # you have volumes and bind mounts
@@ -139,7 +122,7 @@ secrets:
 # bind mounts does the same, but you handle it yourself, and give a specific folder on the host machine
 # here, we are asked for a volume that acts like a bind mounts, so it's fucking annoying
 # we could simply do this in the container part in services: 
-	# /home/apeuget42/data:/var/lib/mysql
-	# left = local host, right = container
+  # /home/apeuget42/data:/var/lib/mysql
+  # left = local host, right = container
 # but no, it's never that easy
 

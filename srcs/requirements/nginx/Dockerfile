@@ -2,14 +2,15 @@ FROM debian:bookworm
 # FROM allows us to tell Docker which image to get based on, here we basically have an empty shell
 # container
 
-
-RUN apt-get update -y && apt-get upgrade -y
+RUN apt-get update -y 
 # update: updates list of available packages and their versions
 # upgrade: installs newer versions
-RUN apt-get install nginx -y
+RUN apt-get install -y nginx openssl
 # this is when our container becomes a nginx container
 # -y : apt will ask if we want to continue with installation, -y allows us to answer before end
 # so it doesn't stop to get our input
+# OpenSSL if a tool for handling and creating SSL certificates
+RUN rm -rf /var/lib/apt/lists/*
 
 
 # TLS part
@@ -17,8 +18,6 @@ RUN apt-get install nginx -y
 RUN mkdir -p /etc/nginx/ssl
 # -p allows us to create the folder ssl AND its parents
 # this folder will be the place where we store our certificate and key for the secured connection
-RUN apt-get install openssl -y
-# OpenSSL if a tool for handling and creating SSL certificates
 RUN openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/nginx/ssl/inception.key \
     -subj "/C=FR/L=Marseille/O=42/CN=apeuget.42.fr/UID=apeuget42"
 # we generate an SSL certificate with a precise format (-x509), -nodes allows us to bypass the password
@@ -39,9 +38,9 @@ EXPOSE 443
 # 443 is the port to access https
 
 
-RUN chmod 755 /var/www/wordpress
+# RUN chmod 755 /var/www/wordpress
 # giving us (root user) all rights needed on our wordpress folder
-RUN chown -R www-data:www-data /var/www/wordpress
+# RUN chown -R www-data:www-data /var/www/wordpress
 # chown -R: change a file/folder's owner and group rights recursively (R) for the given folder
 # chown user:group to modify both at the same time
 # user and group www-data are created by debian by default because the security convention is that a web server shouldn't run on root, this role and group are then created for that, which is a role priviledge only to run web pages, and restricted from anything else on the system (eg dl softwares, read psswds...)
