@@ -1,13 +1,14 @@
 FROM debian:bookworm
 
-RUN apt-get update -y && apt-get install -y php php-mysql php-fpm wget && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y php php8.2-fpm wget && rm -rf /var/lib/apt/lists/*
 # wget used for config script
 
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar  && chmod +x wp-cli.phar \
     && mv wp-cli.phar /usr/local/bin/wp
     # make the file executable and move it to somewhere in your PATH to be able to use command `wp` instead of `php wp-cli.phar`
 
-RUN cd /var/www/ && wp core download
+RUN mkdir -p /var/www/wordpress
+RUN cd /var/www/ && wp core download --allow-root
 # check that it creates a folder called wordpress
 # downloads wordpress files
 

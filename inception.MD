@@ -48,9 +48,28 @@ example:
 docker-compose ps to find docker conts in that docker compose environment
 
 # Error fixes:
+
+### No space left on /var
+
+Delete everything : make clean
+
+<!-- ### No space left on /var
+- Check machine storage with `df -h`
+
+- Stop docker with `sudo systemctl stop docker`
+
+- Move data with `sudo mv /var/lib/docker /home/docker-data`
+
+- Configure docker's new path with `sudo nano /etc/docker/daemon.json` and add:  
+{
+    "data-root": "/home/docker-data"
+}
+
+- Start docker normally -->
+
 ### Permission denied when make up:
 https://www.hostinger.com/tutorials/how-to-fix-docker-permission-denied-error
-Don't forget to reboot so changes take affect (use `id -nG` to check)
+Don't forget to reboot so changes take affect (use `id -nG`target wordpress: failed to solve: process "/bin/sh -c apt-get update -y && apt-get install -y php php-mysql php-fpm wget && rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100 to check)
 
 ### Network is unreachable:
 "target mariadb: failed to solve: debian:bookworm: failed to resolve source metadata for docker.io/library/debian:bookworm: failed to do request: Head "https://registry-1.docker.io/v2/library/debian/manifests/bookworm": dial tcp [2600:1f18:2148:bc00:c80c:3676:30dd:a616]:443: connect: network is unreachable"  
