@@ -37,7 +37,7 @@ example:
 
 6th step:
 - link my local machine to my VM to access the wordpress website from outside the VM and change VM localhost IP to domain name
-# Change your localhost IP to your domain name
+#### Change your localhost IP to your domain name
     Go to file /etc/hosts
     Add following line : "127.0.0.1 domain_name"
 
@@ -69,7 +69,7 @@ Delete everything : make clean
 
 ### Permission denied when make up:
 https://www.hostinger.com/tutorials/how-to-fix-docker-permission-denied-error
-Don't forget to reboot so changes take affect (use `id -nG`target wordpress: failed to solve: process "/bin/sh -c apt-get update -y && apt-get install -y php php-mysql php-fpm wget && rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100 to check)
+Don't forget to reboot so changes take affect, use `id -nG` (target wordpress: failed to solve: process "/bin/sh -c apt-get update -y && apt-get install -y php php-mysql php-fpm wget && rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100 to check)
 
 ### Network is unreachable:
 "target mariadb: failed to solve: debian:bookworm: failed to resolve source metadata for docker.io/library/debian:bookworm: failed to do request: Head "https://registry-1.docker.io/v2/library/debian/manifests/bookworm": dial tcp [2600:1f18:2148:bc00:c80c:3676:30dd:a616]:443: connect: network is unreachable"  

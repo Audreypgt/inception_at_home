@@ -4,6 +4,8 @@
 sleep 10
 # make sure database is ready
 
+chown -R www-data:www-data /var/www/wordpress
+
 if [ ! -f /var/www/wordpress/wp-config.php ]; then
 # verify path
     wp config create --allow-root --dbname=$MYSQL_DATABASE --dbuser=$MYSQL_USER --dbpass=$MYSQL_PASSWORD --dbhost=mariadb:3306 --path /var/www/wordpress

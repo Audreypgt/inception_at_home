@@ -74,7 +74,7 @@ services:
 
 networks:
   docker-network:
-    driver: default # default == bridge, creates a network where only the containers inside it can communicate
+    driver: bridge # default == bridge, creates a network where only the containers inside it can communicate
     # completely isolated from the host machine's network (opposite is mode host)
 
 volumes:
@@ -88,7 +88,7 @@ volumes:
       # specifies the filesystem type (eg ext4, tmpfs, or none for bind mounts)
       o: bind
       # mount options (eg bind for bind mounts, ro for read-only, size=1G for tmpfs)
-      device: /home/apeuget42/data
+      device: /home/apeuget42/data/mariadb
       # path to the host device directory or special value (eg tmpfs for in-memory storage)
       # where data will be stored on host machine
   wordpress_vol:
@@ -96,7 +96,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/apeuget42/data
+      device: /home/apeuget42/data/wordpress
 
 secrets:
   db_password:
