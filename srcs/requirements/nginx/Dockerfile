@@ -38,9 +38,9 @@ EXPOSE 443
 # 443 is the port to access https
 
 
-# RUN chmod 755 /var/www/wordpress
+RUN chmod 755 /var/www/wordpress
 # giving us (root user) all rights needed on our wordpress folder
-# RUN chown -R www-data:www-data /var/www/wordpress
+RUN chown -R www-data:www-data /var/www/wordpress
 # chown -R: change a file/folder's owner and group rights recursively (R) for the given folder
 # chown user:group to modify both at the same time
 # user and group www-data are created by debian by default because the security convention is that a web server shouldn't run on root, this role and group are then created for that, which is a role priviledge only to run web pages, and restricted from anything else on the system (eg dl softwares, read psswds...)
