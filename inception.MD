@@ -1,8 +1,13 @@
-1st step: 
-- install Docker (check Docker documentation)
-- start docker `sudo systemctl start docker`
+Website:
+https://localhost:443/
+https://apeuget.42.fr/
 
-2nd step: 
+
+1st step DOCKER: 
+- install Docker (check Docker documentation)
+- start docker `sudo systemctl start docker` or make start
+
+2nd step NGINX: 
 - write dockerfile for NGINX  
 CMD: instruction to be executed everytime the RUN (meaning docker run I think) command is executed, only if no argument is passed with RUN, otherwise, it is overidden by the arguments
 ex:
@@ -11,52 +16,76 @@ ex:
         -->  Hello from Docker
     docker run myimage World
         --> Hello from World
+- dockerfile, script and configuration file
 
-- build the image : `docker build [path to folder with dockerfile]`  
-   - you can use -t flag to name it `docker build -t [name] [path]`  
-    - to check images: `docker image ls`  
-    - to start the image: `docker run --name [name] [img_name]` (add -it flag before name to get the cont's terminal)  
-        - (sudo docker run -it --name test nginx bash) idk why bash  
-    - to check started conts: docker ps (to see stopped ones too, add -a flag)  
-    - to delete all conts even stopped ones: `sudo docker container prune`  
-    - if you modify your container after running it, use `nginx -s reload`
-    - in case something does not work as expected, you may try to find out the reason in `access.log` and `error.log` files in the directory `/usr/local/nginx/logs` or `/var/log/nginx`
-example:  
-`sudo docker run -it --name mon_test nginx bash` (use exit when done)  
-`sudo docker stop mon_test `  
-`sudo docker rm mon_test `  
+3rd step MARIADB:
+- docker file and configuration file
+- .env and secret files
 
-3nd step:
-- dockerfile, .env/txt files, script and configuration file for mariadb
+4th step WORDPRESS:
+- docker file, ...
 
-4th step:
-- docker file, script and configuration file for wordpress
-
-5th step:
+As you go (when needed):
 - docker-compose file
-
-6th step:
-- link my local machine to my VM to access the wordpress website from outside the VM and change VM localhost IP to domain name
+- change VM localhost IP to domain name
 #### Change your localhost IP to your domain name
     Go to file /etc/hosts
     Add following line : "127.0.0.1 domain_name"
-
-7th step:
+- change the IP adress in /etc/resolv.cnf file to 8.8.8.8
 - makefile
 
 # Useful commands
-docker-compose ps to find docker conts in that docker compose environment
+
+- `docker-compose ps` to find docker conts in that docker compose environment
+- `docker image ls` to check images
+- `docker run --name [name] [img_name]` to start image
+- `docker run -it --name nginx bash` to run a container
+- `docker ps -a` to see started and stoppped conts
+- `docker container prune` to delete all conts even stopped ones
+- `nginx -s reload` if you modify your container after running it or just docker compose up it again with make up
+
+## Test Mariadb is correctly setup
+
+mariadb-check -A
+(-A == all databases)
+
+check the DB:
+- go into container `docker exec -it mariadb bash`
+- check the DB is launched `mariadb-admin ping`
+- log into DB `mariadb -u root -p`
+- try these commands:
+    - `SHOW DATABASES;`
+    - `SELECT user, host FROM mysql.user;` (you should see the users we created and the % under host)
+    - `SHOW GRANTS FOR 'db_user'@'%';`
+- if this fails go back to your container and check your env variables were correctly set:
+    - `echo $DB_NAME`
+    - `echo $DB_USER`
+    - `echo $DB_PASSWORD`
+    - `echo $DB_ROOT_PASSWORD`
 
 # Error fixes:
+
+### Error logs:
+In case something does not work as expected, you might find out the reason in `access.log` and `error.log` files in the directory `/usr/local/cont_name/logs` or `/var/log/cont_name`
 
 ### Permission denied when make up:
 https://www.hostinger.com/tutorials/how-to-fix-docker-permission-denied-error
 Don't forget to reboot so changes take affect, use `id -nG` (target wordpress: failed to solve: process "/bin/sh -c apt-get update -y && apt-get install -y php php-mysql php-fpm wget && rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100 to check)
 If you already added your user to docker group, try changing rights of ~/.docker folder from root to your user
 
+**If it was working before, try executing your command in srcs with using make up (then you can just make clean and try make up again)**
+
 ### Network is unreachable:
 "target mariadb: failed to solve: debian:bookworm: failed to resolve source metadata for docker.io/library/debian:bookworm: failed to do request: Head "https://registry-1.docker.io/v2/library/debian/manifests/bookworm": dial tcp [2600:1f18:2148:bc00:c80c:3676:30dd:a616]:443: connect: network is unreachable"  
 -> change IP adress in file etc/resolv.conf to 8.8.8.8 (DNS) to prevent being blocked
+
+### Problem with env variables:
+Check they were correctly setup with:
+- `echo $DB_NAME`
+- `echo $DB_USER`
+- `echo $DB_PASSWORD`
+- `echo $DB_ROOT_PASSWORD`
+
 
 # Resources:
 
