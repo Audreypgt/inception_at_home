@@ -41,8 +41,9 @@ As you go (when needed):
 - `docker run --name [name] [img_name]` to start image
 - `docker run -it --name nginx bash` to run a container
 - `docker ps -a` to see started and stoppped conts
-- `docker container prune` to delete all conts even stopped ones
+- `docker container prune` to delete all conts even stopped ones, see whole command in makefile
 - `nginx -s reload` if you modify your container after running it or just docker compose up it again with make up
+- `service --status-all` check all running services in a container (use docker exec -it to go inside the cont)
 
 ## Test Mariadb is correctly setup
 
@@ -62,6 +63,9 @@ check the DB:
     - `echo $DB_USER`
     - `echo $DB_PASSWORD`
     - `echo $DB_ROOT_PASSWORD`
+
+## Check container logs
+Use `docker logs [cont name]`
 
 # Error fixes:
 
@@ -86,6 +90,19 @@ Check they were correctly setup with:
 - `echo $DB_PASSWORD`
 - `echo $DB_ROOT_PASSWORD`
 
+### Check nginx sees wordpress files:
+- get in the container with docker exec
+- go to /var/www/html
+- use `ls`
+- if needed, check /var/log/nginx/error.log
+
+### 502 bad gateway:
+Nginx can't communicate with php or the upstream host or the docker container
+How to fix it:
+- 
+
+## Notes on volumes:
+They don't only allow you to copy your service's files from the container to the host, but also to allow your server to see your wordpress files, therefore, without our wordpress volume, nginx can't access the website's files and therefore we get a 404 error if we try opening it on a web browser
 
 # Resources:
 
@@ -118,7 +135,7 @@ Check they were correctly setup with:
 - [Core install usage](https://developer.wordpress.org/cli/commands/core/install/)
 - [Tuto install wordpress and wp-cli](https://xtom.com/blog/how-to-install-wp-cli-on-debian-12-and-setup-a-new-wordpress-website-via-ssh/)
 - [Tuto install wordpress and wp-cli](https://helpdocs.hostmyservers.fr/en/docs/cloud/linux/applications/wordpress-wpcli-install/)
-
+- [Docker-compose up vs docker-compose run](https://stackoverflow.com/questions/33066528/should-i-use-docker-compose-up-or-run)
 
 ### Not used (retro websites)
 git@github.com:Lmendev/CartoonNetwork-2000-Clone.git  
