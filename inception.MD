@@ -99,7 +99,24 @@ Check they were correctly setup with:
 ### 502 bad gateway:
 Nginx can't communicate with php or the upstream host or the docker container
 How to fix it:
-- 
+- i think the issue was that i didnt have a cmd or entrepoint command in my wordpress dockerfile, so i added this : CMD ["/usr/sbin/php-fpm8.2", "-F"] (this can be removed when the wp-config.php creation script is launched with entrypoint as the script has this command)
+
+### Error establishing a database connection:
+Error caused by a bad wp-config.php file or by a connection problem between wordpress and mariadb, in my case it was caused by a connection problem
+In wordpress container's terminal:
+- check if wordpress can communicate with mariadb: `ping mariadb`, if you get something, this means networking is fine and the containers can communicate, or skip this step if ping isn't available on the container and you don't want to install it
+- check `nc -zv mariadb 3306` or `echo > /dev/tcp/mariadb/3306 && echo 'PORT OPEN' || echo 'PORT CLOSED'` if nc isn't available
+In mariadb containers's terminal:
+- check if mariadb (the database, the process, not the container) is running with `ps aux`
+- here i modified the launch command for mariadb from `mysqld_safe` to `mysqld_safe &`, then ps aux again but nothing changed
+- check the mariadb logs with docker logs (here i had this errors : mysqld_safe Logging to syslog.  mysqld_safe Starting mariadbd daemon with databases from /var/lib/mysql)
+- check the rights on the /var/lib/mysql folder with `ls -la`, here my rights are okay, but i had a lot of .pid files from previous containers
+- clean those pid files and check for a stale socket with `rm -f /var/lib/mysql/*.pid && rm -f /run/mysqld/mysqld.sock` and restart the container with docker restart
+- if this didn't fix it, run mysql with logs going to the output `mysqld --user=mysql 2>&1 | head -50`
+- try to find solutions according to the errors seen
+- in my case, the problem is that the volume folder (data) on the local host is never cleaned even when containers are deleted --> I added the rm commands in my makefile for this
+- after fixing the issues, check the previous steps (test port 3306, check the available processes in the mariadb container, check the error logs) and check the database connection from the mariadb container `mariadb -h mariadb -u user -p1234 mariadb`
+- if you don't see anything that seems wrong, check the website
 
 ## Notes on volumes:
 They don't only allow you to copy your service's files from the container to the host, but also to allow your server to see your wordpress files, therefore, without our wordpress volume, nginx can't access the website's files and therefore we get a 404 error if we try opening it on a web browser
