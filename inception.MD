@@ -1,13 +1,13 @@
-Website:
-https://localhost:443/
+Website:  
+https://localhost:443/  
 https://apeuget.42.fr/
 
 
-1st step DOCKER: 
+# 1st step DOCKER: 
 - install Docker (check Docker documentation)
 - start docker `sudo systemctl start docker` or make start
 
-2nd step NGINX: 
+# 2nd step NGINX: 
 - write dockerfile for NGINX  
 CMD: instruction to be executed everytime the RUN (meaning docker run I think) command is executed, only if no argument is passed with RUN, otherwise, it is overidden by the arguments
 ex:
@@ -18,21 +18,22 @@ ex:
         --> Hello from World
 - dockerfile, script and configuration file
 
-3rd step MARIADB:
+# 3rd step MARIADB:
 - docker file and configuration file
 - .env and secret files
 
-4th step WORDPRESS:
-- docker file, ...
+# 4th step WORDPRESS:
+- docker file, script (to create wp-config.php, 2nd user and install theme) and skip the "famous 5 min installation process", www.conf (modify listen line to the correct port), theme (zip file)
 
-As you go (when needed):
+# As you go (when needed):
 - docker-compose file
 - change VM localhost IP to domain name
+- docker secrets (optional)
+
 #### Change your localhost IP to your domain name
-    Go to file /etc/hosts
-    Add following line : "127.0.0.1 domain_name"
-- change the IP adress in /etc/resolv.cnf file to 8.8.8.8
-- makefile
+- Go to file /etc/hosts
+- Add following line : "127.0.0.1 domain_name"
+- Also change the IP adress in /etc/resolv.cnf file to 8.8.8.8
 
 # Useful commands
 
@@ -45,13 +46,10 @@ As you go (when needed):
 - `nginx -s reload` if you modify your container after running it or just docker compose up it again with make up
 - `service --status-all` check all running services in a container (use docker exec -it to go inside the cont)
 
-## Test Mariadb is correctly setup
-
-mariadb-check -A
-(-A == all databases)
-
+### Test Mariadb is correctly setup
 check the DB:
 - go into container `docker exec -it mariadb bash`
+- `mariadb-check -A` (-A == all databases)
 - check the DB is launched `mariadb-admin ping`
 - log into DB `mariadb -u root -p`
 - try these commands:
@@ -64,8 +62,13 @@ check the DB:
     - `echo $DB_PASSWORD`
     - `echo $DB_ROOT_PASSWORD`
 
-## Check container logs
+### Check if container restart policy is as written in compose file
+`docker inspect cont_name --format="{{.HostConfig.RestartPolicy.Name}}"`
+
+### Check container logs
 Use `docker logs [cont name]`
+
+
 
 # Error fixes:
 
@@ -100,6 +103,7 @@ Check they were correctly setup with:
 Nginx can't communicate with php or the upstream host or the docker container
 How to fix it:
 - i think the issue was that i didnt have a cmd or entrepoint command in my wordpress dockerfile, so i added this : CMD ["/usr/sbin/php-fpm8.2", "-F"] (this can be removed when the wp-config.php creation script is launched with entrypoint as the script has this command)
+- could be that you refreshed the website too fast and the 5 sleep before the wordpress script starts hasn't ended yet
 
 ### Error establishing a database connection:
 Error caused by a bad wp-config.php file or by a connection problem between wordpress and mariadb, in my case it was caused by a connection problem
@@ -150,6 +154,7 @@ They don't only allow you to copy your service's files from the container to the
 - [Config create usage](https://make.wordpress.org/cli/handbook/references/config/)
 - [Config create usage](https://developer.wordpress.org/cli/commands/config/create/)
 - [Core install usage](https://developer.wordpress.org/cli/commands/core/install/)
+- [Theme install](https://developer.wordpress.org/cli/commands/theme/install/)
 - [Tuto install wordpress and wp-cli](https://xtom.com/blog/how-to-install-wp-cli-on-debian-12-and-setup-a-new-wordpress-website-via-ssh/)
 - [Tuto install wordpress and wp-cli](https://helpdocs.hostmyservers.fr/en/docs/cloud/linux/applications/wordpress-wpcli-install/)
 - [Docker-compose up vs docker-compose run](https://stackoverflow.com/questions/33066528/should-i-use-docker-compose-up-or-run)
