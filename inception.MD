@@ -24,16 +24,26 @@ ex:
 
 # 4th step WORDPRESS:
 - docker file, script (to create wp-config.php, 2nd user and install theme) and skip the "famous 5 min installation process", www.conf (modify listen line to the correct port), theme (zip file)
+#### Install a theme
+- Download the theme files on your host machine, unzip it and take the folder inside it out and rezip this folder
+- Add this zipped folder to your files (I put it in the tools folder of the container)
+- COPY it to your container in the var/www/wordpress/wp-content/themes folder
+- Add the correct commands to the bash configuration script (wp theme install) --> you need this command twice to dezip and install the theme and then to activate it
 
 # As you go (when needed):
 - docker-compose file
 - change VM localhost IP to domain name
 - docker secrets (optional)
-
 #### Change your localhost IP to your domain name
 - Go to file /etc/hosts
 - Add following line : "127.0.0.1 domain_name"
 - Also change the IP adress in /etc/resolv.cnf file to 8.8.8.8
+#### Set up Docker secrets
+- In docker-compose.yaml add a `secrets` variable to your service image in `services` and add only the variables your container needs 
+- Create a `secrets` section at the end of your file and add all the variables with the path to each corresponding file
+    - In your .txt file, you can either put the secret directly or format it as SECRET="secret"
+- At the top of the file where you need your secret variables,
+- Note that you don't need to declare a "env_file" variable in you service image in the services section
 
 # Useful commands
 
@@ -62,15 +72,17 @@ check the DB:
     - `echo $DB_PASSWORD`
     - `echo $DB_ROOT_PASSWORD`
 
-### Check if container restart policy is as written in compose file
+### Check if container restart policy is as written in compose file (yes the container can disobey you apparently)
 `docker inspect cont_name --format="{{.HostConfig.RestartPolicy.Name}}"`
 
 ### Check container logs
 Use `docker logs [cont name]`
 
+## Notes on volumes:
+They don't only allow you to copy your service's files from the container to the host, but also to allow your server to see your wordpress files, therefore, without our wordpress volume, nginx can't access the website's files and therefore we get a 404 error if we try opening it on a web browser
 
 
-# Error fixes:
+# Error handling:
 
 ### Error logs:
 In case something does not work as expected, you might find out the reason in `access.log` and `error.log` files in the directory `/usr/local/cont_name/logs` or `/var/log/cont_name`
@@ -80,7 +92,7 @@ https://www.hostinger.com/tutorials/how-to-fix-docker-permission-denied-error
 Don't forget to reboot so changes take affect, use `id -nG` (target wordpress: failed to solve: process "/bin/sh -c apt-get update -y && apt-get install -y php php-mysql php-fpm wget && rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100 to check)
 If you already added your user to docker group, try changing rights of ~/.docker folder from root to your user
 
-**If it was working before, try executing your command in srcs with using make up (then you can just make clean and try make up again)**
+**If it was working before, try executing your command in srcs without using make up (then you can just make clean and try make up again)**
 
 ### Network is unreachable:
 "target mariadb: failed to solve: debian:bookworm: failed to resolve source metadata for docker.io/library/debian:bookworm: failed to do request: Head "https://registry-1.docker.io/v2/library/debian/manifests/bookworm": dial tcp [2600:1f18:2148:bc00:c80c:3676:30dd:a616]:443: connect: network is unreachable"  
@@ -91,7 +103,9 @@ Check they were correctly setup with:
 - `echo $DB_NAME`
 - `echo $DB_USER`
 - `echo $DB_PASSWORD`
-- `echo $DB_ROOT_PASSWORD`
+- `echo $DB_ROOT_PASSWORD`  
+
+or in /run/secrets/ in your container if you're using docker secrets
 
 ### Check nginx sees wordpress files:
 - get in the container with docker exec
@@ -122,10 +136,10 @@ In mariadb containers's terminal:
 - after fixing the issues, check the previous steps (test port 3306, check the available processes in the mariadb container, check the error logs) and check the database connection from the mariadb container `mariadb -h mariadb -u user -p1234 mariadb`
 - if you don't see anything that seems wrong, check the website
 
-## Notes on volumes:
-They don't only allow you to copy your service's files from the container to the host, but also to allow your server to see your wordpress files, therefore, without our wordpress volume, nginx can't access the website's files and therefore we get a 404 error if we try opening it on a web browser
-
 # Resources:
+
+### Inception guide
+- [Guide 42](https://medium.com/@ssterdev/inception-guide-42-project-part-i-7e3af15eb671)
 
 ### Docker
 - [Install Docker](https://docs.docker.com/engine/install/debian/#install-using-the-repository)
@@ -141,15 +155,6 @@ They don't only allow you to copy your service's files from the container to the
 - [Understand nginx conf](https://www.nicelydev.com/nginx/comprendre-nginx-conf)
 - [Doc](https://nginx.org/en/docs/)
 
-### Inception guide
-- [Guide 42](https://medium.com/@ssterdev/inception-guide-42-project-part-i-7e3af15eb671)
-
-### Network
-- [Bridge explanation](https://www.nicelydev.com/docker/reseau-host-bridge)
-
-### Volumes
-- [Local driver meaning](https://www.codestudy.net/blog/docker-compose-volumes-driver-local-meaning/)
-
 ### Wordpress and wp-config
 - [Config create usage](https://make.wordpress.org/cli/handbook/references/config/)
 - [Config create usage](https://developer.wordpress.org/cli/commands/config/create/)
@@ -158,6 +163,15 @@ They don't only allow you to copy your service's files from the container to the
 - [Tuto install wordpress and wp-cli](https://xtom.com/blog/how-to-install-wp-cli-on-debian-12-and-setup-a-new-wordpress-website-via-ssh/)
 - [Tuto install wordpress and wp-cli](https://helpdocs.hostmyservers.fr/en/docs/cloud/linux/applications/wordpress-wpcli-install/)
 - [Docker-compose up vs docker-compose run](https://stackoverflow.com/questions/33066528/should-i-use-docker-compose-up-or-run)
+
+### Volumes
+- [Local driver meaning](https://www.codestudy.net/blog/docker-compose-volumes-driver-local-meaning/)
+
+### Network
+- [Bridge explanation](https://www.nicelydev.com/docker/reseau-host-bridge)
+
+### Secrets
+- [How-to](https://blog.stephane-robert.info/docs/conteneurs/moteurs-conteneurs/docker/secrets/)
 
 ### Not used (retro websites)
 git@github.com:Lmendev/CartoonNetwork-2000-Clone.git  
