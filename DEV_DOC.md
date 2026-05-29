@@ -17,6 +17,7 @@ ex:
     docker run myimage World
         --> Hello from World
 - dockerfile, script and configuration file
+- check website, there should be a 404 or 403 (or another one I don't remember) 
 
 # 3rd step MARIADB:
 - docker file and configuration file
@@ -24,6 +25,7 @@ ex:
 
 # 4th step WORDPRESS:
 - docker file, script (to create wp-config.php, 2nd user and install theme) and skip the "famous 5 min installation process", www.conf (modify listen line to the correct port), theme (zip file)
+
 #### Install a theme
 - Download the theme files on your host machine, unzip it and take the folder inside it out and rezip this folder
 - Add this zipped folder to your files (I put it in the tools folder of the container)
@@ -32,8 +34,9 @@ ex:
 
 # As you go (when needed):
 - docker-compose file
-- change VM localhost IP to domain name
+- change your localhost IP to domain name
 - docker secrets (optional)
+
 #### Change your localhost IP to your domain name
 - Go to file /etc/hosts
 - Add following line : "127.0.0.1 domain_name"
@@ -46,7 +49,6 @@ ex:
 - Note that you don't need to declare a "env_file" variable in you service image in the services section
 
 # Useful commands
-
 - `docker-compose ps` to find docker conts in that docker compose environment
 - `docker image ls` to check images
 - `docker run --name [name] [img_name]` to start image
@@ -78,11 +80,8 @@ check the DB:
 ### Check container logs
 Use `docker logs [cont name]`
 
-## Notes on volumes:
-They don't only allow you to copy your service's files from the container to the host, but also to allow your server to see your wordpress files, therefore, without our wordpress volume, nginx can't access the website's files and therefore we get a 404 error if we try opening it on a web browser
 
-
-# Error handling:
+# Error handling/fixing:
 
 ### Error logs:
 In case something does not work as expected, you might find out the reason in `access.log` and `error.log` files in the directory `/usr/local/cont_name/logs` or `/var/log/cont_name`
@@ -136,42 +135,19 @@ In mariadb containers's terminal:
 - after fixing the issues, check the previous steps (test port 3306, check the available processes in the mariadb container, check the error logs) and check the database connection from the mariadb container `mariadb -h mariadb -u user -p1234 mariadb`
 - if you don't see anything that seems wrong, check the website
 
-# Resources:
 
-### Inception guide
-- [Guide 42](https://medium.com/@ssterdev/inception-guide-42-project-part-i-7e3af15eb671)
+# Glossary:
+- Nginx: Server
+- MariaDB: Database, fork of mySQL that is opensource and community developped
+- Wordpress: 
+- Fpm: used to hook wp cont to nginx, by configuring some php supports so nginx knows how to run php when it receives a request from the browser (this is the location ~ \.php$ part in our nginx config file
+- Volumes:
+    - Notes: They don't only allow you to copy your service's files from the container to the host, but also to allow your server to see your wordpress files, therefore, without our wordpress volume, nginx can't access the website's files and therefore we get a 404 error if we try opening it on a web browser
+- Bind-mounts: 
+- Docker network:
+- Docker secrets:
 
-### Docker
-- [Install Docker](https://docs.docker.com/engine/install/debian/#install-using-the-repository)
 
-### Setting up mariadb
-- [Setting up mariadb](https://oneuptime.com/blog/post/2026-01-16-docker-mysql-mariadb/view)
-
-### Nginx
-- [Certificate user info](https://www.ibm.com/docs/en/ibm-mq/7.5.0?topic=certificates-distinguished-names)
-- [Write nginx config file](https://nginx.org/en/docs/beginners_guide.html#conf_structure)
-- [Nginx daemon off](https://labex.io/questions/what-is-the-purpose-of-the-nginx-g-daemon-off-command-in--871954)
-- [Nginx dockerfile example](https://github.com/ADILRAQ/Inception-42-cursus/blob/main/srcs/requirements/nginx/Dockerfile)
-- [Understand nginx conf](https://www.nicelydev.com/nginx/comprendre-nginx-conf)
-- [Doc](https://nginx.org/en/docs/)
-
-### Wordpress and wp-config
-- [Config create usage](https://make.wordpress.org/cli/handbook/references/config/)
-- [Config create usage](https://developer.wordpress.org/cli/commands/config/create/)
-- [Core install usage](https://developer.wordpress.org/cli/commands/core/install/)
-- [Theme install](https://developer.wordpress.org/cli/commands/theme/install/)
-- [Tuto install wordpress and wp-cli](https://xtom.com/blog/how-to-install-wp-cli-on-debian-12-and-setup-a-new-wordpress-website-via-ssh/)
-- [Tuto install wordpress and wp-cli](https://helpdocs.hostmyservers.fr/en/docs/cloud/linux/applications/wordpress-wpcli-install/)
-- [Docker-compose up vs docker-compose run](https://stackoverflow.com/questions/33066528/should-i-use-docker-compose-up-or-run)
-
-### Volumes
-- [Local driver meaning](https://www.codestudy.net/blog/docker-compose-volumes-driver-local-meaning/)
-
-### Network
-- [Bridge explanation](https://www.nicelydev.com/docker/reseau-host-bridge)
-
-### Secrets
-- [How-to](https://blog.stephane-robert.info/docs/conteneurs/moteurs-conteneurs/docker/secrets/)
 
 ### Not used (retro websites)
 git@github.com:Lmendev/CartoonNetwork-2000-Clone.git  
