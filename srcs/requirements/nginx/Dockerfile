@@ -32,7 +32,6 @@ COPY conf/nginx.conf /etc/nginx/nginx.conf
 # now for the config file, it is already existing, but we want to modify it, therefore we will create a copy of
 # the config file we made, and add it in the original folder to replace it
 
-
 EXPOSE 443
 # To use when making the network, allows us to choose to expose a port to the other conts
 # 443 is the port to access https
